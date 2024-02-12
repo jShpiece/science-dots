@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Wastebin: Bayesian Mapping</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script></head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../research-blog.html">Research Blog</a></li>
+                <li class="dropdown">
+                    <a href="javascript:void(0)">Research Wastebin</a>
+                    <div class="dropdown-content">
+                        <a href="research-wastebin/annular-flexion.html">Annular Flexion</a>
+                        <a href="research-wastebin/lens-forecasting.html">Lens Forecasting</a>
+                        <a href="research-wastebin/bayesian-mapping.html">Bayesian Mapping</a>
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="javascript:void(0)">Game Design</a>
+                    <div class="dropdown-content">
+                        <a href="../game-design/oathbound.html">The Oathbound System</a>
+                        <a href="../game-design/project.html">Project 2</a>
+                        <!-- More project pages -->
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="javascript:void(0)">Curios</a>
+                    <div class="dropdown-content">
+                        <a href="../curios/curio1.html">Curio 1</a>
+                        <a href="../curios/curio2.html">Curio 2</a>
+                        <!-- More curio pages -->
+                    </div>
+                </li>
+                <li><a href="../contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Bayesian Mapping</h1>
+        
+        <h2>The Objective</h2>
+<p>My thesis topic involves generating a statistical test to use weak gravitational lensing to locate substructure within galaxy clusters without relying on guesses or models of the target clusters. Weak lensing reconstructions are a powerful tool in probing the mass distribution of large systems, but most rely on making certain assumptions, in what are called 'parametric reconstructions' - that is, reconstructions that fit to certain parameters within a model. The problem is, naturally, that nature doesn't always follow our models perfectly. In particular, a common lensing assumption is that 'light traces mass' - that is, wherever mass accumulates, there will be processes that produce light.</p> 
+
+<p>This is a reasonable assumption for large clumps of dark matter - while dark matter itself can never produce light, baryonic matter will be reliably pulled into these dark matter halos. Baryonic matter <i>does</i> reliably produce light, by producing stars and undergoing other luminous behavior (bremsstrahlung radiation, as an example).</p>
+
+<p>However, as we consider smaller halos (here a 'small' halo is one with a mass that falls below 10<sup>13</sup> times the mass of our sun), this assumption breaks down. These halos are not guaranteed a steady stream of baryons during formation, which means that their luminous behavior is unreliable, and lensing reconstructions are prone to undercounting them. A test that <i>doesn't</i> rely on these assumptions may therefore uncover valuable information on the structure of some of the largest objects in the universe.</p>
+
+<h2>The Approach</h2>
+<p>Consider a single source, where different lensing signals have been measured. At first glance, it seems like there are an infinite number of allowed lenses to explain this signal. But are there really?</p>
+
+<p>Consider a simple toy problem - a 1D universe where we observe a galaxy with some flexion, F. As we've worked out in previous exercises, using a Singular Isothermal Sphere model for a lens, we can forecast different strengths for a hypothetical lens - as we move further from the source, the lens grows stronger in order to produce the same signal, with uncertainty in the lens strength derived from uncertainty in the measurement. But, while we can forecast an infinite range of allowed lenses based on this measurement, <i>not all of these lenses are equally plausible.</i> It is <i>possible</i> that my measurement of this single galaxy has predicted a lens with an Einstein radius hundreds of arcseconds wide, but not very probable.</p>
+
+<p>We can frame this as a Bayesian problem. Given the observe flexion of this source, F, what is the <i>likelihood</i> of locating a lens at distance r, with strength \( \theta_E \)? Or, what is \( P(\theta_E|F,r) \)? Lets break out Bayes' theorem, folks!</p>
+
+<p> $$ P(\theta_E|F,r) = \dfrac{P(F|\theta_E,r)P(\theta_E|r)}{P(F|r)} $$ </p>
+
+<p>For the uninitiated, Bayes' theorem is a delightfully powerful statistical tool, allowing us to forecast the likelihood of an observation based on the prior information we have about the phenomena we are observing. Here I have written the theorem for three distinct <b>events</b>: that we measure a source with flexion F, that we find a lens at separation r, and that the located lens has a strength of θ<sub>E</sub>. If we can solve for this probability then we can scan the entire probability space, looking for peaks where we <i>expect</i> lenses to be found. So, let's consider each of these terms.</p>
+
+<h3>The Conditional Probability</h3>
+<p>P(F|θ<sub>E</sub>,r) is the easiest term to solve for - if we located a lens of this strength and at this position, how likely is this measurement. Since we're using the SIS model, we know that the <i>true</i> flexion of the source will be given by \( F = \dfrac{-\theta_E}{2r^2} \) - as a function of the Einstein radius and separation, we are justified in saying that our conditional probability is <i>actually</i> expressing the following - \( P(\tilde{F}|F) \), where \( \tilde{F} \) denotes the measured flexion, and \( F \) denotes the true flexion. Since the flexion's noise can be taken to follow a Gaussian distribution, we can write down this relationship exactly.</p>
+
+<p> $$  \Large P(\tilde{F}|F) = \dfrac{1}{\sqrt{2\pi\sigma_F^{2}}} e^{-\left( \dfrac{\tilde{F} - F}{2\sigma_F} \right)^2} $$ </p>
+<p>As we get further from the observed flexion (in units of σ<sub>F</sub>, the expected noise in the signal), the likelihood of our lens being real gets smaller and smaller. To put it plainly, this term will ask the question: if the true flexion really <i>is</i> 10, how is it possible we made a measurement of 0.1?</p>
+
+<h3>Prior Probability</h3>
+<p>We can make the simplifying assumption that \( P(\theta_E|r) = P(\theta_E) \). Lenses are not preferentially distributed in space, so the location that we check does not make it any more or less likely that a lens of a certain strength is present, <i>a priori</i>. As the Einstein radius gives the mass of the halo, we can constrain this probability by invoking the halo mass function. The mass function of dark matter halos goes as \( \dfrac{dN}{dM} \propto M^{-1.9} \) - and the Einstein radius is proportional to the square root of the halo mass, so that the number of halos at a certain value of \( \theta_E \) should go as \( \theta_E^{-0.95} \). All we need to do is normalize it. Choosing a minimum value of 1 arcsecond and a maximum size of 1 arcminute, we can write</p>
+
+<p>$$ \Large P(\theta_{E}|r)= \beta\theta_E^{-\alpha/2} $$ </p>
+<p>With normalization constants \( \beta = 0.22 \) and \( \alpha = 1.9 \) .</p>
+
+<h3>Marginal Probability</h3>
+<p>This has been blessedly simple, which means its time for some nasty algebra to rear its head. What is the likelihood of having made this measurement, P(Ṕ) in the first place? Remembering that this is a continuous variable, we can use the law of total probability to write</p>
+
+<p>$$ \Large P(\tilde{F}) = \int_{-\infty}^{\infty}P(\tilde{F}|F)P(F)dF$$ </p>
+<p>This writeup is not intended to trace out every step of algebra, so I'll simply say that we can make use of the relation \( P(F)dF = \dfrac{-P(\theta_E)}{2r^2}d\theta_E \) in order to integrate over all allowed Einstein radii, which we already have a strong description of, instead of integrating over all possible flexion measurements, which is an unconstrained problem.</p>
+
+<h3>The Result</h3>
+<p>Our probability function is admittedly ungainly, but quite useful.</p>
+
+<p> $$ \Large P(\theta_E|\tilde{F},r) = 2r^{2}\dfrac{g(\tilde{F},\theta_{E}, r)\theta_E^{\frac{-\alpha}{2}}}{\int g(\tilde{F},\theta_{E}, r)\theta_E^{\frac{-\alpha}{2}}d\theta_E} $$ </p>
+<p>Where I've introduced the function</p>
+
+<p> $$ \Large g=e^{-\left( \dfrac{\tilde{F} - F}{2\sigma_F} \right)^2} $$ </p>
+<p>to clean the function up.</p>
+
+<h3>Summary</h3>
+
+<p>Alright, that was a lot of math to get to a result! Let's summarize what we have here. A single flexion measurement is capable of predicting an infinite number of allowed lenses. What we have here is a way of evaluating those predictions - ideally allowing us to select the predictions that are most likely to actually exist. We can construct a 3D parameter space (x, y, θ<sub>E</sub>) for the allowed lens properties, compute the likelihood function in this parameter space, and then go hunting for maxima. We can even build maps out of these! By integrating over the z axis, which deals with lens strength, we should see locations where lenses are favored lighting up for us!</p>
+<figure>
+    <img src="../Images/flexion_weighting_onesource.png" alt="Flexion weighting on a single source"
+    style="width:75%;height:75%;">
+    <figcaption>A likelihood map drawn for a single source, which we see pointing directly at the lens (though the maxima don't quite find it). Multiple sources should zone in on this lens, neatly constrianing it in our probability space.</figcaption>
+</figure>
+
+
+<h2>Successes</h2>
+
+<p>First off, for a single lens, this method worked reliably under realistic conditions! The arguments are simple enough that, unlike our previous approach, expanding to 2D space is straightforward, and handling noise is already baked in to the approach. With noisy data, as few as twenty sources were capable of getting within 1-2 arcseconds of the true position of a lens. </p>
+
+<p>Additionally, the fact that our final product is a likelihood distribution opened up an exciting possibility - likelihoods can be compared, and the derivation above can be applied to other signals like the shear. In principle, this approach would represent a novel method for combining the shear and flexion signals, which are independent measurements that are not always easy to combine in a single method. This represents a potential treasure trove of information for us to draw on. 
+
+<!-- Rest of the content -->
+<h2>Problems</h2>
+<p>First off - this is <i>slow</i>. The denominator of our likelihood function is an integral, which varies with r and \( \theta_E \), and which cannot be solved analytically. What this means is that for every coordinate I check I need to solve the integral computationally, and I'll need to repeat this for <b>each source</b> that I consider. This becomes slow and cumbersome extremely quickly - a simple test model that I create might take as long as thirty minutes to run, and real data might take hours of computation. This might not seem like a long time on the scale of a five year project (I sure didn't think so at the time), but I quickly learned that it made debugging and testing different approaches a pain. You don't ever want to run a test where you change more than one thing at a time, so that you clearly understand how things are behaving, and so making three simple changes to the code could take up an entire afternoon of work. 
+
+<p>Second, this method does not scale well to <i>multiple</i> lenses in the same field. Consider what the pipeline will make of two identical lenses put down in space. It might find both of them - or it might do a very good job of finding one (whichever the source is closer to), <i>or</i> it might say that there's one lens with double the strength in between the two lenses. We hoped that by computing the likelihood distribution for multiple sources that the true solution would be favored, but multiple sources introduces new complications. How are different sources to be weighted, relative to each other? Because the product is a likelihood that already took source noise into account, it seems as though they should be weighted equally - but not bad predictions are liable to dominate our likelihood maps. 
+
+<p>This is dancing around a fundamental problem with adding lenses to the system - we are no longer in a 3 dimensional parameter space, but a 3N+1 dimensional parameter space - each lens has its 3 (x, y, $\theta_E$) parameters, and the +1 comes from the fact that N is a parameter itself. Remember, we are trying to make as few assumptions about the underlying system as possible - we can't go in and *tell* the method that it has to find 2 lenses. This is not good news for an approach that is already straining under a heavy computational load. We need some approach that can constrain the number of lenses that we are looking for - trying to solve this will ultimately lead to a new (and my current) approach. 
+
+<h2>What I Learned</h2>
+<list>
+    <li>Accurate is better than elegant</li>
+    <li>Fast is better than slow</li>
+    <li>It isn't enough for a solution to work <b>sometimes</b>. </li>
+</list>
+
+    </main>
+    
+    <footer>
+        <p>&copy; 2024, Jacob Shpiece. All rights reserved.</p>
+    </footer>
+</body>
+
+
+
+</html>
